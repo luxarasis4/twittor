@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"os"
 
@@ -13,7 +14,7 @@ var (
 	userController = newUserController()
 )
 
-func Managers(chanel chan error) {
+func Managers() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/auth/registry", middleware.CheckDB(userController.Registry)).Methods("POST")
@@ -26,5 +27,8 @@ func Managers(chanel chan error) {
 
 	handler := cors.AllowAll().Handler(router)
 
-	chanel <- http.ListenAndServe(":"+PORT, handler)
+	err := http.ListenAndServe(":"+PORT, handler)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }
