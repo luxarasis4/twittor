@@ -1,6 +1,6 @@
 package dtos
 
-type GeneralResponseDTO struct {
+type ErrorResponseDTO struct {
 	Status string `json:"status"`
 	Code   int    `json:"code"`
 	Data   any    `json:"data,omitempty"`

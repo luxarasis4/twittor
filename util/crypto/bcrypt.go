@@ -6,7 +6,14 @@ const (
 	cost = 8
 )
 
-func EncryptPasswordWithBcrypt(pass string) (string, error) {
+type BcryptUtil struct{}
+
+func (*BcryptUtil) EncryptPassword(pass string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(pass), cost)
 	return string(bytes), err
+}
+
+func (*BcryptUtil) ValidatePassword(pass string, hash string) (bool, error) {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(pass))
+	return err == nil, err
 }

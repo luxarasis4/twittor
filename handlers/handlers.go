@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"os"
 
@@ -14,10 +13,11 @@ var (
 	userController = newUserController()
 )
 
-func Managers() {
+func Managers(chanel chan error) {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/auth/registry", middleware.CheckDB(userController.Registry)).Methods("POST")
+	router.HandleFunc("/auth/login", middleware.CheckDB(userController.Login)).Methods("POST")
 
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
@@ -26,8 +26,5 @@ func Managers() {
 
 	handler := cors.AllowAll().Handler(router)
 
-	err := http.ListenAndServe(":"+PORT, handler)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	chanel <- http.ListenAndServe(":"+PORT, handler)
 }

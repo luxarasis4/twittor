@@ -28,12 +28,14 @@ var (
 
 type UserRepository struct {
 	collection *mongo.Collection
+	bcryptUtil *crypto.BcryptUtil
 }
 
 func NewUserRepository() *UserRepository {
 	userRepositoryOnce.Do(func() {
 		userRepositoryInterface = &UserRepository{
 			collection: database.MongoCN.Database(databaseTwittor).Collection(collectionUser),
+			bcryptUtil: &crypto.BcryptUtil{},
 		}
 	})
 
@@ -44,7 +46,7 @@ func (repository *UserRepository) Save(entity entities.UserEntity) (string, bool
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	entity.Password, _ = crypto.EncryptPasswordWithBcrypt(entity.Password)
+	entity.Password, _ = repository.bcryptUtil.EncryptPassword(entity.Password)
 
 	result, err := repository.collection.InsertOne(ctx, entity)
 
